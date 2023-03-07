@@ -44,7 +44,7 @@ const EmptyBasket = (props) => {
 
 const BasketItem = (props) => {
     const IMAGE_URL = "./images/" + nameToImageURL(props.name, "-", ".jpg")
-    const TOTAL_ITEM_PRICE = (Number(props.price) * Number(props.quantity)).toFixed(2)
+    const TOTAL_ITEM_PRICE = Number(((Number(props.price) * Number(props.quantity)) * 100).toFixed(0)) / 100
     return (
         <section className="basket-item-section">
             <input type="hidden" name="product-id" disabled value={props.prodID} />
