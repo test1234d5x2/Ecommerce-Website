@@ -77,7 +77,7 @@ export class Login extends React.Component {
 
         let token = jwt_encode({"name": userData.name, "email": userData.email}, process.env.REACT_APP_JWT_SECRET)
 
-        fetch("http://moselsh.eu.pythonanywhere.com/customers/" + process.env.REACT_APP_CUSTOMER_MODEL_URL_ACCESS + "/" + token)
+        fetch("https://moselsh.eu.pythonanywhere.com/customers/" + process.env.REACT_APP_CUSTOMER_MODEL_URL_ACCESS + "/" + token)
 
         return
     }

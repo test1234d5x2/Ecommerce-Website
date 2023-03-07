@@ -163,7 +163,7 @@ class FilterSection extends React.Component {
 }
 
 const ProductCard = (props) => {
-    const FULL_PRODUCT_DATA_URL_BASE = "http://moselsh.eu.pythonanywhere.com/api/product/"
+    const FULL_PRODUCT_DATA_URL_BASE = "https://moselsh.eu.pythonanywhere.com/api/product/"
     const IMAGE_SRC = "./images/" + nameToImageURL(props.itemData.name, "-", ".jpg")
     const NEW_BANNER = props.itemData.new === true ? <NewBanner />: ""
     const AVAILABILITY = (props.itemData.available === false) ? <OutOfStock />: ""
