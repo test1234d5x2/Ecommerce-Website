@@ -1,0 +1,13 @@
+.out-of-stock-section {
+    display: flex;
+    align-items: center;
+    color: rgb(138, 0, 0);
+    margin: 0.25rem 0;
+}
+
+.out-of-stock-icon {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+}

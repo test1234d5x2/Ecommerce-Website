@@ -1,0 +1,40 @@
+footer {
+    padding: max(5vh, 50px) 0;
+    background: lightgrey;
+    display: flex;
+    justify-content: center;
+    row-gap: 2rem;
+    column-gap: 1rem;
+}
+
+.footer-section {
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+    row-gap: 0.25rem;
+    width: max(20%, 200px);
+}
+
+.footer-title {
+    font-size: clamp(1rem, 0.75vw + 0.75rem, 1.75rem);
+}
+
+.footer-link {
+    cursor: pointer;
+    font-size: clamp(0.75rem, 0.5vw + 0.25rem, 1.25rem);
+    color: black;
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+.social-icons {
+    max-width: max(2vw, 20px);
+    max-height: max(2vw, 20px);
+}
+
+#phone {
+    text-decoration: none;
+}

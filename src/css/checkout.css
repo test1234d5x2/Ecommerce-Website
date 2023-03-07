@@ -1,0 +1,36 @@
+#checkout-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column;
+    row-gap: 1rem;
+}
+
+#delivery-warning-section {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+    color: rgb(138, 0, 0);
+}
+
+#delivery-warning-section * {
+    display: block;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+#delivery-address-section {
+    display: flex;
+    flex-flow: column;
+    row-gap: 1rem;
+}
+
+.address-input-section {
+    display: flex;
+    flex-flow: column;
+}
+
+.address-input-section input {
+    width: max(25vw, 200px);
+    font-size: 1rem;
+}
