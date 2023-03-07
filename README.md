@@ -4,7 +4,7 @@ A fake Ecommerce Website using Django REST API and React.
 
 ## Live URL:
 
-![Live Site](https://moselsh.github.io/Ecommerce-Website/)
+![Live Site](https://MosElsh.github.io/Ecommerce-Website/)
 
 ## Note:
 There is no payments section yet. This will be developed.
