@@ -29,7 +29,7 @@ export class Page extends React.Component {
             "Price: Low - High": "/asc/price",
             "Price: High - Low": "/desc/price",
         }
-        this.BASE_API_URL = "http://moselsh.eu.pythonanywhere.com/api/products"
+        this.BASE_API_URL = "https://moselsh.eu.pythonanywhere.com/api/products"
         this.ORIGINAL_API_URL = this.BASE_API_URL + this.SORT_BY_OPTIONS['Relevance']
 
         this.state = {
