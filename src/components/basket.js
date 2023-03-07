@@ -24,7 +24,7 @@ export class Basket extends React.Component {
                 { (basketElements.length === 0) ? <EmptyBasket /> : basketElements }
 
                 {/* If there aren't any basket elements, no need to show checkout button. If the user is logged out, disable the checkout button. */}
-                { (basketElements.length !== 0) ? <button id="checkout-button" disabled={this.props.loggedIn === false} >Checkout {this.props.loggedIn === false ? " - Must login first": ""}</button>: "" }
+                { (basketElements.length !== 0) ? <button id="checkout-button" disabled={true} >Checkout {this.props.loggedIn === false ? " - Must login first": ""}</button>: "" }
             </section>
         )
     }
