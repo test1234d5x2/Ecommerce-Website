@@ -1,7 +1,7 @@
 {
   "name": "ecommerce-website",
   "version": "0.1.0",
-  "homepage": "http://MosElsh.github.io/Ecommerce-website",
+  "homepage": "https://MosElsh.github.io/Ecommerce-website",
   "private": true,
   "dependencies": {
     "@react-oauth/google": "^0.5.1",
