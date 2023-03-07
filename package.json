@@ -2,7 +2,7 @@
   "name": "ecommerce-website",
   "version": "0.1.0",
   "homepage": "https://moselsh.github.io/Ecommerce-Website",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@react-oauth/google": "^0.5.1",
     "@stripe/react-stripe-js": "^1.16.4",
