@@ -134,9 +134,6 @@ export class Page extends React.Component {
     // Upon mounting, display the first set of data (all the products in one set) for initial filling.
     componentDidMount() {
 
-        // Fetch the initial set of data which is all the products.
-        this.fetchAPIdata(this.state.apiURL, this.state.selectedPriceFilter, this.state.selectedColourFilter, this.state.selectedAvailableFilter, this.state.typeFilter, "products")
-
         // Setup the colour filters so they don't have to change each time.
         fetch(this.state.apiURL).then((response) => {return response.json()}).then((data) => {
             let allColourFilters = []
@@ -145,6 +142,9 @@ export class Page extends React.Component {
             })
             this.state.allColourFilters = allColourFilters.map((colour) => {return <CheckBox toggleCheckBoxFilterValues={this.toggleCheckBoxFilterValues} inputName="Colour" value={colour} />})
         })
+
+        // Fetch the initial set of data which is all the products.
+        this.fetchAPIdata(this.state.apiURL, this.state.selectedPriceFilter, this.state.selectedColourFilter, this.state.selectedAvailableFilter, this.state.typeFilter, "products")
     }
 
     // If no filters, retrieve products straight away. If there are filters, create the extra filter URL and then retrieve products. 
