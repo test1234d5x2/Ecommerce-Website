@@ -75,6 +75,8 @@ export class Login extends React.Component {
         this.props.toggleLoggedIn()
         this.props.updateUserData(userData.email, userData.name, userData.name, userData.picture)
 
+        console.log(process.env.REACT_APP_CUSTOMER_MODEL_URL_ACCESS)
+
         let token = jwt_encode({"name": userData.name, "email": userData.email}, process.env.REACT_APP_JWT_SECRET)
 
         fetch("https://moselsh.eu.pythonanywhere.com/customers/" + process.env.REACT_APP_CUSTOMER_MODEL_URL_ACCESS + "/" + token)
