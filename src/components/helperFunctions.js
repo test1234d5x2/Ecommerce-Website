@@ -21,7 +21,7 @@ export function isPositiveDecimalNumber(num) {
     return valid
 }
 
-// In the form of "filterData[price=<min-price>,<max-price>&colour=<colour>|<colour>|<colour>&available=Yes&type=<type>&new=Yes]"
+// In the form of "price=<min-price>,<max-price>&colour=<colour>|<colour>|<colour>&available=Yes&type=<type>&new=Yes"
 // Every single filter type is optional so none of them are actually needed for products to be shown.
 export function createURLFilter(selectedPriceFilter, selectedColourFilter, selectedAvailableFilter, typeFilter="") {
 
