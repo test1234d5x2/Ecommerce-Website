@@ -141,6 +141,7 @@ export class Page extends React.Component {
                 return (allColourFilters.indexOf(item['colour']) < 0) ? allColourFilters.push(item['colour']): ""
             })
             this.state.allColourFilters = allColourFilters.map((colour) => {return <CheckBox toggleCheckBoxFilterValues={this.toggleCheckBoxFilterValues} inputName="Colour" value={colour} />})
+            this.updateStateValueWithAPIdata(this.state.allColourFilters, "allColourFilters")
         })
 
         // Fetch the initial set of data which is all the products.
