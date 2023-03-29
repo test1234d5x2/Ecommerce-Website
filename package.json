@@ -1,7 +1,7 @@
 {
   "name": "ecommerce-website",
   "version": "0.1.1",
-  "homepage": "",
+  "homepage": "https://master--vocal-crisp-fe0e9a.netlify.app/",
   "private": false,
   "dependencies": {
     "@react-oauth/google": "^0.5.1",
