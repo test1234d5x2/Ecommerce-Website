@@ -23,11 +23,11 @@ function App() {
     return (
         <Routes>
             <Route exact path='/' element={<Page />}>
-                <Route path='/products' element={<ProductList />} />
-                <Route path='/products/:typeFilter' element={<ProductList />} />
-                <Route path='/product/:prodID' element={<ProductDetails />} />
-                <Route path='/basket' element={<MainBasket />} />
-                <Route path='*' element={<main><h1>404 Error</h1><p>Click on one of the links above or below to head back to a page.</p></main>} />
+                <Route exact path='/products' element={<ProductList />} />
+                <Route exact path='/products/:typeFilter' element={<ProductList />} />
+                <Route exact path='/product/:prodID' element={<ProductDetails />} />
+                <Route exact path='/basket' element={<MainBasket />} />
+                <Route exact path='*' element={<main><h1>404 Error</h1><p>Click on one of the links above or below to head back to a page.</p></main>} />
             </Route>
         </Routes>
     )
