@@ -1,18 +1,182 @@
 import React from "react";
 import { H3Title, H2Title } from "./titles";
-import { capitaliseFirstLetter, nameToImageURL, listValueToSelectOption } from "./helperFunctions";
+import { capitaliseFirstLetter, nameToImageURL, listValueToSelectOption, isPositiveNumber, createURLFilter } from "./helperFunctions";
 import { NewBanner } from "./newBanner";
 import { v4 } from "uuid";
+import { useParams, useOutletContext } from "react-router-dom";
+import { ErrorMessage } from "./errorMessage";
 
-export class ProductList extends React.Component {
+export const ProductList = (props) => {
+    let params = useParams()
+    let context = useOutletContext()
+    return <ProductListWrapper typeFilter={params.typeFilter || "Collections"} context={context} />
+}
+
+export class ProductListWrapper extends React.Component {
     constructor(props) {
         super(props)
 
+        this.TYPE_FILTER_PAIRING = {
+            "NEW!": "new=Yes",
+            "Collections": "",
+            "Shirts": "type=Shirts",
+            "Polo Shirts": "type=Polo Shirts",
+            "Formal": "type=Formal",
+        }
+        this.SORT_BY_OPTIONS = {
+            "Relevance": "/asc/prodID",
+            "Price: Low - High": "/asc/price",
+            "Price: High - Low": "/desc/price",
+        }
+        this.BASE_API_URL = "https://moselsh.eu.pythonanywhere.com/api/products"
+        this.ORIGINAL_API_URL = this.BASE_API_URL + this.SORT_BY_OPTIONS['Relevance'] + "/" + this.TYPE_FILTER_PAIRING[props.typeFilter]
+
+        this.state = {
+            allColourFilters: [],
+            apiURL: this.ORIGINAL_API_URL,
+            selectedPriceFilter: [],
+            selectedColourFilter: [],
+            selectedAvailableFilter: [],
+            products: [],
+            chosenSortOption: "Relevance",
+            typeFilter: props.typeFilter,
+            errorMessageDisplay: false,
+            errorMessage: "",
+        }
+
         this.filterSectionRef = React.createRef()
 
+        this.changeSortOption = this.changeSortOption.bind(this)
+        this.refreshProductsList = this.refreshProductsList.bind(this)
+        this.removePriceFilters = this.removePriceFilters.bind(this)
+        this.submitPriceFilterValues = this.submitPriceFilterValues.bind(this)
+        this.toggleCheckBoxFilterValues = this.toggleCheckBoxFilterValues.bind(this)
+        this.toggleErrorMessageDisplay = this.toggleErrorMessageDisplay.bind(this)
         this.toggleMobileFiltersDisplay = this.toggleMobileFiltersDisplay.bind(this)
+        this.updateApiUrl = this.updateApiUrl.bind(this)
+        this.updateStateValue = this.updateStateValue.bind(this)
     }
-    
+
+    // Chnages the sort option and then retrieves products in a different order.
+    changeSortOption(event) {
+        const NEW_API_URL = this.BASE_API_URL + this.SORT_BY_OPTIONS[event.target.value] + createURLFilter(this.state.selectedPriceFilter, this.state.selectedColourFilter, this.state.selectedAvailableFilter, this.TYPE_FILTER_PAIRING[this.state.typeFilter])
+        
+        this.setState((state) => {
+            return {
+                chosenSortOption: event.target.value,
+            }
+        })
+
+        this.updateApiUrl(this.state.selectedPriceFilter, this.state.selectedColourFilter, this.state.selectedAvailableFilter, this.SORT_BY_OPTIONS[event.target.value])
+        this.refreshProductsList(NEW_API_URL)
+        return
+    }
+
+    componentDidMount() {
+        // Setup the colour filters so they don't have to change each time.
+        fetch(this.state.apiURL).then((response) => {return response.json()}).then((data) => {
+            let allColourFilters = []
+            data.forEach((item) => {
+                return (allColourFilters.indexOf(item['colour']) < 0) ? allColourFilters.push(item['colour']): ""
+            })
+            allColourFilters = allColourFilters.map((colour) => {return <CheckBox toggleCheckBoxFilterValues={this.toggleCheckBoxFilterValues} inputName="Colour" value={colour} />})
+            this.updateStateValue("allColourFilters", allColourFilters)
+        })
+
+        this.refreshProductsList(this.state.apiURL)
+        return
+    }
+
+    refreshProductsList(apiURL) {
+        fetch(apiURL).then((response) => {return response.json()}).then((data) => {
+            this.updateStateValue("products", data)
+        })
+
+        return
+    }
+
+    // Removes price filters and updates the list of products seen.
+    removePriceFilters() {
+        this.setState((state) => {
+            return {
+                selectedPriceFilter: []
+            }
+        })
+
+        this.refreshProductsList(this.updateApiUrl([]))
+
+        return
+    }
+
+    // Validate the entered minimum and maximum price before submitting them as price filters.
+    submitPriceFilterValues(event, minPrice, maxPrice) {
+        event.preventDefault()
+        let errors = {
+            "errorMessageDisplay": false,
+            "errorMessage": "",
+        }
+
+        // Check lengths of both inputs. If they're not filled then they must try again.
+        if (minPrice.length === 0 || maxPrice.length === 0) {
+            errors['errorMessage'] = "Both price values must be filled in. Please amend your choices."
+            errors['errorMessageDisplay'] = true
+        }
+
+        if (!isPositiveNumber(minPrice) || !isPositiveNumber(maxPrice)) {
+            errors['errorMessage'] = "Both values must be a whole number. Please amend your choices"
+            errors['errorMessageDisplay'] = true
+        }
+
+        // Check that the minimum price is smaller than the maximum price. If not then user must try again.
+        else if (Number(minPrice) > Number(maxPrice)) {
+            errors['errorMessageDisplay'] = true
+            errors['errorMessage'] = "The minimum price must be smaller than the maximum price. Please amend your choices."
+        }
+
+        // If there are any errors, return the errors. If not, store the values as price filters.
+        if (errors['errorMessageDisplay'] === true) {
+            this.setState((state) => {
+                return errors
+            })
+        }
+        else {
+            let newSelectedPriceFilter = [minPrice, maxPrice]
+            this.updateStateValue("selectedPriceFilter", newSelectedPriceFilter)
+            this.setState((state) => {
+                return errors
+            })
+
+            this.refreshProductsList(this.updateApiUrl(newSelectedPriceFilter))
+
+        }
+
+        return
+    }
+
+    // Toggles colour and available filter values by either adding or removing it. It then updates the list of products seen.
+    toggleCheckBoxFilterValues(event) {
+        // Gets the correct index for the filters list.
+        let filterIndexName = "selected" + String(event.target.name) + "Filter"
+        let indexFilterValues = this.state[filterIndexName]
+
+        // Checks if the value is in the list. If it's in the list, remove it because it must be a filter. If it's not in the list, it's not a filter so add it.
+        let result = (indexFilterValues.indexOf(event.target.value) < 0) ? indexFilterValues.push(event.target.value): indexFilterValues.splice(indexFilterValues.indexOf(event.target.value), 1)
+
+        this.updateStateValue(filterIndexName, indexFilterValues)
+
+        this.refreshProductsList(this.updateApiUrl())
+
+        return
+    }
+
+    toggleErrorMessageDisplay(event) {
+        this.setState((state) => {
+            return {errorMessageDisplay: this.state.errorMessageDisplay === true ? false: true}
+        })
+
+        return
+    }
+
     // Toggle the display of the filters section for mobile phones.
     toggleMobileFiltersDisplay(event) {
         this.filterSectionRef.current.style.right = this.filterSectionRef.current.style.right === "0px" ? "100%": "0px"
@@ -20,34 +184,52 @@ export class ProductList extends React.Component {
         return
     }
 
+    updateApiUrl(selectedPriceFilter=this.state.selectedPriceFilter, selectedColourFilter=this.state.selectedColourFilter, selectedAvailableFilter=this.state.selectedAvailableFilter, sortOption=this.SORT_BY_OPTIONS[this.state.chosenSortOption]) {
+        this.setState((state) => {
+            return {apiURL: this.BASE_API_URL + sortOption + createURLFilter(selectedPriceFilter, selectedColourFilter, selectedAvailableFilter, this.TYPE_FILTER_PAIRING[this.state.typeFilter])}
+        })
+
+        return this.BASE_API_URL + this.SORT_BY_OPTIONS[this.state.chosenSortOption] + createURLFilter(selectedPriceFilter, selectedColourFilter, selectedAvailableFilter, this.TYPE_FILTER_PAIRING[this.state.typeFilter])
+    }
+
+    updateStateValue(index, value) {
+        let obj = {}
+        obj[index] = value
+        this.setState((state) => {
+            return obj
+        })
+
+        return
+    }
+
     render() {
-        const SORT_BY_OPTIONS = listValueToSelectOption(Object.keys(this.props.SORT_BY_OPTIONS))
+        const SORT_BY_OPTIONS = listValueToSelectOption(Object.keys(this.SORT_BY_OPTIONS))
 
         // Dealing with displaying products.
         let productList = []
-        this.props.products.forEach((item) => {
-            return productList.push(<ProductCard key={v4()} itemData={item} fetchAPIdata={this.props.fetchAPIdata} />)
+        this.state.products.forEach((item) => {
+            return productList.push(<ProductCard key={v4()} itemData={item} />)
         })
 
         return (
             <section id="products-list-information">
-                <H2Title id="product-list-title" title={"Shop for Clothes: " + this.props.clothesType} />
+                <H2Title id="product-list-title" title={"Shop for Clothes: " + this.props.typeFilter} />
                 <section id="products-list-section-container">
                     <FilterSection
-                        submitPriceFilterValues={this.props.submitPriceFilterValues}
-                        allColourFilters={this.props.allColourFilters} 
-                        toggleCheckBoxFilterValues={this.props.toggleCheckBoxFilterValues}
+                        submitPriceFilterValues={this.submitPriceFilterValues}
+                        allColourFilters={this.state.allColourFilters} 
+                        toggleCheckBoxFilterValues={this.toggleCheckBoxFilterValues}
                         toggleMobileFiltersDisplay={this.toggleMobileFiltersDisplay}
-                        selectedPriceFilter={this.props.selectedPriceFilter}
-                        selectedColourFilter={this.props.selectedColourFilter}
-                        selectedAvailableFilter={this.props.selectedAvailableFilter}
-                        removePriceFilters={this.props.removePriceFilters}
+                        selectedPriceFilter={this.state.selectedPriceFilter}
+                        selectedColourFilter={this.state.selectedColourFilter}
+                        selectedAvailableFilter={this.state.selectedAvailableFilter}
+                        removePriceFilters={this.removePriceFilters}
                         filterSectionRef={this.filterSectionRef}
                     />
                     <section id="products-list-section">
                         <section id="products-list-metadata">
                             <section id="products-list-length-container">
-                                <span id="products-list-length">{this.props.products.length} {this.props.products.length === 1 ? "item": "items"} found</span>
+                                <span id="products-list-length">{this.state.products.length} {this.state.products.length === 1 ? "item": "items"} found</span>
                             </section>
                             <section id="mobile-products-filter-toggle-container" className="mobile">
                                 <span id="mobile-products-filters-toggle" onClick={this.toggleMobileFiltersDisplay}>
@@ -57,7 +239,7 @@ export class ProductList extends React.Component {
                             </section>
                             <section id="sort-by-section">
                                 <span id="sort-by-text">Sort By</span>
-                                <select id="sort-by-options" onChange={this.props.changeSortOption}>
+                                <select id="sort-by-options" onChange={this.changeSortOption}>
                                     {SORT_BY_OPTIONS}
                                 </select>
                             </section>
@@ -67,6 +249,7 @@ export class ProductList extends React.Component {
                         </section>
                     </section>
                 </section>
+                {(this.state.errorMessageDisplay === true) ? <ErrorMessage message={this.state.errorMessage} toggleErrorMessageBox={this.toggleErrorMessageDisplay} />: ""}
             </section>
         )
     }
@@ -134,9 +317,9 @@ class FilterSection extends React.Component {
                     <section className="filter-type">
                         <FilterSubheading title="Price:" />
                         <form className="price-range-container" onSubmit={(event) => {this.props.submitPriceFilterValues(event, this.state["min-price"], this.state["max-price"])}}>
-                            <input type="number" name="min-price" placeholder="min" className="min-price-input" value={this.minPrice} onChange={this.changeInputValue} />
+                            <input type="number" name="min-price" placeholder="min" className="min-price-input" value={this.state["min-price"]} onChange={this.changeInputValue} />
                             <span>-</span>
-                            <input type="number" name="max-price" placeholder="max" className="max-price-input" value={this.maxPrice} onChange={this.changeInputValue} />
+                            <input type="number" name="max-price" placeholder="max" className="max-price-input" value={this.state["max-price"]} onChange={this.changeInputValue} />
                             <button className="price-range-submit">➔</button>
                         </form>
                         <br />
@@ -163,18 +346,19 @@ class FilterSection extends React.Component {
 }
 
 const ProductCard = (props) => {
-    const FULL_PRODUCT_DATA_URL_BASE = "https://moselsh.eu.pythonanywhere.com/api/product/"
     const IMAGE_SRC = "./images/" + nameToImageURL(props.itemData.name, "-", ".jpg")
     const NEW_BANNER = props.itemData.new === true ? <NewBanner />: ""
     const AVAILABILITY = (props.itemData.available === false) ? <OutOfStock />: ""
     return (
-        <section className="product-card-container" onClick={(event) => {props.fetchAPIdata(FULL_PRODUCT_DATA_URL_BASE + props.itemData.prodID, [], [], [], "", "fullProductData")}}>
-            <img src={IMAGE_SRC} className="product-image" alt={props.itemData.name} />
-            {NEW_BANNER}
-            <span className="product-name">{props.itemData.name}</span>
-            <span className="product-price">£{props.itemData.price}</span>
-            {AVAILABILITY}
-        </section>
+        <a href={"./product/" + props.itemData.prodID} className="product-link">
+            <section className="product-card-container">
+                <img src={IMAGE_SRC} className="product-image" alt={props.itemData.name} />
+                {NEW_BANNER}
+                <span className="product-name">{props.itemData.name}</span>
+                <span className="product-price">£{props.itemData.price}</span>
+                {AVAILABILITY}
+            </section>
+        </a>
     )
 }
 

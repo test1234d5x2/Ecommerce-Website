@@ -29,6 +29,10 @@
     width: min-content;
 }
 
+#google-login-area div div div iframe {
+    color: white;
+}
+
 #user-details {
     margin: 0 1rem;
     display: flex;

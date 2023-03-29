@@ -1,5 +1,5 @@
 import React from "react";
-import { Basket } from "./basket";
+import { HeaderBasket } from "./basket";
 import { Login } from "./login";
 
 export class Header extends React.Component {
@@ -74,8 +74,8 @@ export class Header extends React.Component {
                     </section>
                 </section>
 
-                { (this.state.basketDisplay === true) ? <Basket basket={this.props.basket} removeFromBasket={this.props.removeFromBasket} loggedIn={this.props.loggedIn} />: "" }
-                { (this.state.loginDisplay === true) ? <Login loggedIn={this.props.loggedIn} toggleLoggedIn={this.props.toggleLoggedIn} userEmail={this.props.userEmail} name={this.props.name} nameOnOrder={this.props.nameOnOrder} updateUserData={this.props.updateUserData} removeUserData={this.props.removeUserData} />: "" }
+                { (this.state.basketDisplay === true) ? <HeaderBasket basket={this.props.basket} loggedIn={this.props.loggedIn} />: "" }
+                { (this.state.loginDisplay === true) ? <Login loggedIn={this.props.loggedIn} toggleLoggedIn={this.props.toggleLoggedIn} userEmail={this.props.userEmail} name={this.props.name} updateUserData={this.props.updateUserData} removeUserData={this.props.removeUserData} />: "" }
 
                 { /* Mobile Only Start */ }
                 <MobileNav mobileNavRef={this.mobileNavRef} toggleMobileNavDisplay={this.toggleMobileNavDisplay} changeTypeFilter={this.props.changeTypeFilter} />
@@ -102,11 +102,11 @@ const MobileNav = (props) => {
 const NavLinks = (props) => {
     return (
         <nav className={props.viewType + " nav"} id={props.viewType + "-nav-links"}>
-            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="#" onClick={(event) => {props.changeTypeFilter("NEW!")}}>NEW!</a>
-            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="#" onClick={(event) => {props.changeTypeFilter("Collections")}}>Collections</a>
-            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="#" onClick={(event) => {props.changeTypeFilter("Shirts")}}>Shirts</a>
-            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="#" onClick={(event) => {props.changeTypeFilter("Polo Shirts")}}>Polo Shirts</a>
-            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="#" onClick={(event) => {props.changeTypeFilter("Formal")}}>Formal</a>
+            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="./products/NEW!" onClick={(event) => {props.changeTypeFilter("NEW!")}}>NEW!</a>
+            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="./products/Collections" onClick={(event) => {props.changeTypeFilter("Collections")}}>Collections</a>
+            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="./products/Shirts" onClick={(event) => {props.changeTypeFilter("Shirts")}}>Shirts</a>
+            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="./products/Polo Shirts" onClick={(event) => {props.changeTypeFilter("Polo Shirts")}}>Polo Shirts</a>
+            <a className={"nav-link " + props.viewType} id={props.viewType + "-nav-link"} href="./products/Formal" onClick={(event) => {props.changeTypeFilter("Formal")}}>Formal</a>
         </nav>
     )
 }
