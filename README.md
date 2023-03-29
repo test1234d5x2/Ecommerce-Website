@@ -1,4 +1,4 @@
-# Ecommerce Website
+# Ecommerce Website v0.1.1
 A fake Ecommerce Website using Django REST API and React.
 <br><br>
 
