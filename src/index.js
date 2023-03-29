@@ -22,7 +22,7 @@ import { MainBasket } from './components/basket';
 function App() {
     return (
         <Routes>
-            <Route exact path='/' element={<Page />}>
+            <Route exact path='/Ecommerce-Website' element={<Page />}>
                 <Route exact path='/products' element={<ProductList />} />
                 <Route exact path='/products/:typeFilter' element={<ProductList />} />
                 <Route exact path='/product/:prodID' element={<ProductDetails />} />
