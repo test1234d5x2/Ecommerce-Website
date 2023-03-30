@@ -32,6 +32,10 @@
         row-gap: 1rem;
     }
 
+    .product-image {
+        max-width: max(100%, 200px);
+    }
+
     #full-product-info-container {
         flex-flow: column;
     }
