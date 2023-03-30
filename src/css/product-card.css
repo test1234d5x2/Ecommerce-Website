@@ -10,10 +10,8 @@
 }
 
 .product-image {
-    min-width: max(15vw, 200px);
-    min-height: max(15vw, 200px);
-    max-width: min(15vw, 200px);
-    max-height: min(15vw, 200px);
+    max-width: max(100%, 200px);
+    max-height: max(100%, 200px);
 }
 
 .new-banner {
