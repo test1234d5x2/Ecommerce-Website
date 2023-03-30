@@ -42,8 +42,8 @@
     }
 
     #product-image-large {
-        max-width: max(40vw, 200px);
-        max-height: max(40vw, 200px);
+        max-width: max(100%, 200px);
+        max-height: max(100%, 200px);
     }
 
     footer {
