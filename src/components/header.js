@@ -65,6 +65,11 @@ export class Header extends React.Component {
                 </section>
 
                 <section className="header-section" id="top-right-header-section">
+                    <section id="watchlist-icon-section">
+                        <a href="./watchlist">
+                            <img src="./images/star.svg" className="icons" alt="My Watchlist" title="My Watchlist" />
+                        </a>
+                    </section>
                     <section id="basket-icon-section">
                         <span className="material-icons-outlined icons" id="basket-icon" onClick={this.basketDisplayToggle}>shopping_basket</span>
                         <span id="number-of-basket-items">{this.props.basket.length}</span>
