@@ -27,6 +27,12 @@
     -webkit-user-select: none;
 }
 
+.product-name-favourites-combo-section {
+    display: flex;
+    align-items: center;
+    column-gap: 1rem;
+}
+
 .product-name {
     font-size: 1.25rem;
 }
