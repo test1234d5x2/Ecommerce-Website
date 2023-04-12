@@ -1,10 +1,12 @@
 import React from "react";
 import { H3Title, H2Title } from "./titles";
-import { capitaliseFirstLetter, nameToImageURL, listValueToSelectOption, isPositiveNumber, createURLFilter } from "./helperFunctions";
-import { NewBanner } from "./newBanner";
+import { ProductCard } from "./productCard";
+import { NoProductsFound } from "./noProductsFound";
+import { capitaliseFirstLetter, listValueToSelectOption, isPositiveNumber, createURLFilter } from "./helperFunctions";
 import { v4 } from "uuid";
 import { useParams, useOutletContext } from "react-router-dom";
 import { ErrorMessage } from "./errorMessage";
+import jwt_encode from "jwt-encode";
 
 export const ProductList = (props) => {
     let params = useParams()
@@ -15,6 +17,13 @@ export const ProductList = (props) => {
 export class ProductListWrapper extends React.Component {
     constructor(props) {
         super(props)
+
+        let loggedIn = false
+        let userEmail = ""
+        if (window.localStorage.getItem("outfitsora_user_name") !== null) {
+            loggedIn = true
+            userEmail = window.localStorage.getItem("outfitsora_user_email")
+        }
 
         this.TYPE_FILTER_PAIRING = {
             "NEW!": "new=Yes",
@@ -28,7 +37,7 @@ export class ProductListWrapper extends React.Component {
             "Price: Low - High": "/asc/price",
             "Price: High - Low": "/desc/price",
         }
-        this.BASE_API_URL = "https://moselsh.eu.pythonanywhere.com/api/products"
+        this.BASE_API_URL = "http://moselsh.eu.pythonanywhere.com/api/products"
         this.ORIGINAL_API_URL = this.BASE_API_URL + this.SORT_BY_OPTIONS['Relevance'] + "/" + this.TYPE_FILTER_PAIRING[props.typeFilter]
 
         this.state = {
@@ -42,19 +51,39 @@ export class ProductListWrapper extends React.Component {
             typeFilter: props.typeFilter,
             errorMessageDisplay: false,
             errorMessage: "",
+            loggedIn: loggedIn,
+            userEmail: userEmail,
+            watchlist_IDs: []
         }
 
         this.filterSectionRef = React.createRef()
 
+        this.addWatchlistProduct = this.addWatchlistProduct.bind(this)
         this.changeSortOption = this.changeSortOption.bind(this)
         this.refreshProductsList = this.refreshProductsList.bind(this)
         this.removePriceFilters = this.removePriceFilters.bind(this)
+        this.removeWatchlistProduct = this.removeWatchlistProduct.bind(this)
         this.submitPriceFilterValues = this.submitPriceFilterValues.bind(this)
         this.toggleCheckBoxFilterValues = this.toggleCheckBoxFilterValues.bind(this)
         this.toggleErrorMessageDisplay = this.toggleErrorMessageDisplay.bind(this)
         this.toggleMobileFiltersDisplay = this.toggleMobileFiltersDisplay.bind(this)
         this.updateApiUrl = this.updateApiUrl.bind(this)
         this.updateStateValue = this.updateStateValue.bind(this)
+    }
+
+    addWatchlistProduct(prodID) {
+        let token = jwt_encode({"email": this.state.userEmail, "prodID": prodID, "process": "add"}, process.env.REACT_APP_JWT_SECRET)
+        fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
+            console.log(data)
+        })
+        
+        let newWatchlist_IDs = [...this.state.watchlist_IDs]
+        newWatchlist_IDs.push(prodID)
+        this.setState((state) => {
+            return {watchlist_IDs: newWatchlist_IDs}
+        })
+
+        return;
     }
 
     // Chnages the sort option and then retrieves products in a different order.
@@ -82,8 +111,17 @@ export class ProductListWrapper extends React.Component {
             allColourFilters = allColourFilters.map((colour) => {return <CheckBox toggleCheckBoxFilterValues={this.toggleCheckBoxFilterValues} inputName="Colour" value={colour} />})
             this.updateStateValue("allColourFilters", allColourFilters)
         })
-
         this.refreshProductsList(this.state.apiURL)
+
+        // Get the watchlist of the user if logged in
+        if (this.state.loggedIn) {
+            fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + jwt_encode({"email": this.state.userEmail}, process.env.REACT_APP_JWT_SECRET) + "/get").then((response) => {return response.json()}).then((data) => {
+                let watchlist_IDs = []
+                data.forEach((watchlist_product) => {watchlist_IDs.push(watchlist_product[0].prodID)})
+                this.updateStateValue("watchlist_IDs", watchlist_IDs)
+            })
+        }
+
         return
     }
 
@@ -106,6 +144,19 @@ export class ProductListWrapper extends React.Component {
         this.refreshProductsList(this.updateApiUrl([]))
 
         return
+    }
+
+    removeWatchlistProduct(prodID) {
+        let token = jwt_encode({"email": this.state.userEmail, "prodID": prodID, "process": "remove"}, process.env.REACT_APP_JWT_SECRET)
+        fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
+            console.log(data)
+        })
+        
+        let newWatchlist_IDs = [...this.state.watchlist_IDs]
+        newWatchlist_IDs.splice(newWatchlist_IDs.indexOf(prodID), 1)
+        this.setState((state) => {
+            return {watchlist_IDs: newWatchlist_IDs}
+        })
     }
 
     // Validate the entered minimum and maximum price before submitting them as price filters.
@@ -208,7 +259,7 @@ export class ProductListWrapper extends React.Component {
         // Dealing with displaying products.
         let productList = []
         this.state.products.forEach((item) => {
-            return productList.push(<ProductCard key={v4()} itemData={item} />)
+            return productList.push(<ProductCard key={v4()} itemData={item} loggedIn={this.state.loggedIn} watchlist_IDs={this.state.watchlist_IDs} addWatchlistProduct={this.addWatchlistProduct} removeWatchlistProduct={this.removeWatchlistProduct} />)
         })
 
         return (
@@ -345,23 +396,6 @@ class FilterSection extends React.Component {
     }
 }
 
-const ProductCard = (props) => {
-    const IMAGE_SRC = "./images/" + nameToImageURL(props.itemData.name, "-", ".jpg")
-    const NEW_BANNER = props.itemData.new === true ? <NewBanner />: ""
-    const AVAILABILITY = (props.itemData.available === false) ? <OutOfStock />: ""
-    return (
-        <a href={"./product/" + props.itemData.prodID} className="product-link">
-            <section className="product-card-container">
-                <img src={IMAGE_SRC} className="product-image" alt={props.itemData.name} />
-                {NEW_BANNER}
-                <span className="product-name">{props.itemData.name}</span>
-                <span className="product-price">£{props.itemData.price}</span>
-                {AVAILABILITY}
-            </section>
-        </a>
-    )
-}
-
 const FilterSubheading = (props) => {
     return (
         <section className="filter-subheading-container">
@@ -371,28 +405,11 @@ const FilterSubheading = (props) => {
     )
 }
 
-const OutOfStock = (props) => {
-    return (
-        <section className="out-of-stock-section">
-            <span className="out-of-stock-icon material-icons">priority_high</span>
-            <span className="out-of-stock-text">Out of stock</span>
-        </section>
-    )
-}
-
 const ChosenFilter = (props) => {
     return (
         <section className="chosen-filter">
             <span className="chosen-filter-type">{props.filterType}:</span>
             <span className="chosen-filter-value">{props.filterValue}</span>
-        </section>
-    )
-}
-
-const NoProductsFound = (props) => {
-    return (
-        <section id="no-products-found">
-            No Products Found. Please clear some filters.
         </section>
     )
 }
