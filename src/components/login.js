@@ -40,6 +40,8 @@ export class Login extends React.Component {
         this.props.toggleLoggedIn()
         this.props.removeUserData()
 
+        window.location.reload()
+
         return
     }
 
@@ -50,8 +52,9 @@ export class Login extends React.Component {
         this.props.updateUserData(userData.email, userData.name, userData.picture)
 
         let token = jwt_encode({"name": userData.name, "email": userData.email}, process.env.REACT_APP_JWT_SECRET)
-
         fetch("https://moselsh.eu.pythonanywhere.com/customers/" + process.env.REACT_APP_CUSTOMER_MODEL_URL_ACCESS + "/" + token)
+
+        window.location.reload()
 
         return
     }
