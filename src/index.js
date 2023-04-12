@@ -18,6 +18,7 @@ import { Page } from './components/page';
 import { ProductList } from './components/productList';
 import { ProductDetails } from './components/productDetails';
 import { MainBasket } from './components/basket';
+import Watchlist from './components/watchlist';
 
 function App() {
     return (
@@ -27,6 +28,7 @@ function App() {
                 <Route exact path='/products/:typeFilter' element={<ProductList />} />
                 <Route exact path='/product/:prodID' element={<ProductDetails />} />
                 <Route exact path='/basket' element={<MainBasket />} />
+                <Route exact path='/watchlist' element={<Watchlist />} />
                 <Route exact path='*' element={<main><h1>404 Error</h1><p>Click on one of the links above or below to head back to a page.</p></main>} />
             </Route>
         </Routes>
