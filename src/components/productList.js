@@ -37,7 +37,7 @@ export class ProductListWrapper extends React.Component {
             "Price: Low - High": "/asc/price",
             "Price: High - Low": "/desc/price",
         }
-        this.BASE_API_URL = "http://moselsh.eu.pythonanywhere.com/api/products"
+        this.BASE_API_URL = "https://moselsh.eu.pythonanywhere.com/api/products"
         this.ORIGINAL_API_URL = this.BASE_API_URL + this.SORT_BY_OPTIONS['Relevance'] + "/" + this.TYPE_FILTER_PAIRING[props.typeFilter]
 
         this.state = {
@@ -73,7 +73,7 @@ export class ProductListWrapper extends React.Component {
 
     addWatchlistProduct(prodID) {
         let token = jwt_encode({"email": this.state.userEmail, "prodID": prodID, "process": "add"}, process.env.REACT_APP_JWT_SECRET)
-        fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
+        fetch("https://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
             console.log(data)
         })
         
@@ -115,7 +115,7 @@ export class ProductListWrapper extends React.Component {
 
         // Get the watchlist of the user if logged in
         if (this.state.loggedIn) {
-            fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + jwt_encode({"email": this.state.userEmail}, process.env.REACT_APP_JWT_SECRET) + "/get").then((response) => {return response.json()}).then((data) => {
+            fetch("https://moselsh.eu.pythonanywhere.com/api/watchlist/" + jwt_encode({"email": this.state.userEmail}, process.env.REACT_APP_JWT_SECRET) + "/get").then((response) => {return response.json()}).then((data) => {
                 let watchlist_IDs = []
                 data.forEach((watchlist_product) => {watchlist_IDs.push(watchlist_product[0].prodID)})
                 this.updateStateValue("watchlist_IDs", watchlist_IDs)
@@ -148,7 +148,7 @@ export class ProductListWrapper extends React.Component {
 
     removeWatchlistProduct(prodID) {
         let token = jwt_encode({"email": this.state.userEmail, "prodID": prodID, "process": "remove"}, process.env.REACT_APP_JWT_SECRET)
-        fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
+        fetch("https://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
             console.log(data)
         })
         

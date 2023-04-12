@@ -29,7 +29,7 @@ export default class Watchlist extends React.Component {
     componentDidMount() {
         // Get the watchlist of the user if logged in
         if (this.state.loggedIn) {
-            fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + jwt_encode({"email": this.state.userEmail}, process.env.REACT_APP_JWT_SECRET) + "/get").then((response) => {return response.json()}).then((data) => {
+            fetch("https://moselsh.eu.pythonanywhere.com/api/watchlist/" + jwt_encode({"email": this.state.userEmail}, process.env.REACT_APP_JWT_SECRET) + "/get").then((response) => {return response.json()}).then((data) => {
                 let watchlist_item = []
                 data.forEach((watchlist_product) => {watchlist_item.push(watchlist_product[0])})
                 this.updateStateValue("products", watchlist_item)
@@ -41,7 +41,7 @@ export default class Watchlist extends React.Component {
 
     removeWatchlistProduct(prodID) {
         let token = jwt_encode({"email": this.state.userEmail, "prodID": prodID, "process": "remove"}, process.env.REACT_APP_JWT_SECRET)
-        fetch("http://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
+        fetch("https://moselsh.eu.pythonanywhere.com/api/watchlist/" + token).then((response) => {return response.json()}).then((data) => {
             this.setState((state) => {return {refresh: true}})
         })
         
