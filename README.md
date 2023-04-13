@@ -6,10 +6,6 @@ A fake Ecommerce Website using Django REST API and React.
 
 https://moselsh-ecommerce-website.netlify.app/
 
-
-## Note:
-There is no payments section yet. This will be developed.
-
 ## Screenshot:
 ![](Screenshot.png)
 
