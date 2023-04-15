@@ -1,10 +1,14 @@
-# Ecommerce Website v0.1.1
+# Ecommerce Website v0.2.0
 A fake Ecommerce Website using Django REST API and React.
 <br><br>
 
 ## Live URL:
 
 https://moselsh-ecommerce-website.netlify.app/
+
+## API:
+
+Api can be found here: https://github.com/MosElsh/Django-REST-API
 
 ## Screenshot:
 ![](Screenshot.png)
