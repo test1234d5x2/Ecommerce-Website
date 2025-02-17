@@ -13,5 +13,3 @@ Api can be found here: https://github.com/MosElsh/Django-REST-API
 ## Screenshot:
 ![](Screenshot.png)
 
-## Feedback:
-Any feedback and reporting of bugs would be extremely helpful.
